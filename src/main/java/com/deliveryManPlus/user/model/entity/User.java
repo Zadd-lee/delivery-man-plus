@@ -19,14 +19,19 @@ public class User extends CreateAndUpdateDateEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(nullable = false)
     private String nickname;
     private LocalDate birthday;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    private LocalDate canceledDate;
 
     @OneToMany(mappedBy = "user")
     List<BasicAuth> basicAuthList;
