@@ -1,54 +1,41 @@
 package com.deliveryManPlus.controller;
 
-import com.deliveryManPlus.dto.auth.JwtAuthResponseDto;
-import com.deliveryManPlus.dto.auth.LoginRequestDto;
-import com.deliveryManPlus.dto.auth.SigninRequestDto;
-import com.deliveryManPlus.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequiredArgsConstructor
+import static com.deliveryManPlus.utils.Oauth2Utils.generateState;
+
+@Controller
 @RequestMapping("/auth")
 public class AuthController {
+    @Value("${oauth.naver.client-id}")
+    private String naverClientId;
 
-    private final AuthService authService;
+    @Value("${oauth.naver.login-uri}")
+    private String naverLoginUrl;
+
+    @Value("${oauth.naver.redirect-uri}")
+    private String naverRedirectUrl;
 
 
-    @PostMapping("/signin")
-    public ResponseEntity<Void> signin(@Valid @RequestBody SigninRequestDto dto) {
-        authService.signin(dto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @GetMapping("/login/naver")
+    public String loginNaver(HttpServletRequest request) {
+
+        // 상태 토큰으로 사용할 랜덤 문자열 생성
+        String naverState = generateState();
+
+
+        String url = naverLoginUrl
+                + "&client_id=" + naverClientId
+                + "&redirect_uri=" + naverRedirectUrl
+                + "&state=" + naverState;
+
+        request.getSession().setAttribute("state", naverState);
+
+        return "redirect:" + url;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponseDto> login(@Valid @RequestBody LoginRequestDto dto) {
-        return new ResponseEntity<>(authService.login(dto),HttpStatus.OK);
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request,
-                                       HttpServletResponse response, Authentication authentication)
-            throws UsernameNotFoundException {
-        // 인증 정보가 있다면 로그아웃 처리.
-        if (authentication != null && authentication.isAuthenticated()) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
-        // 인증 정보가 없다면 인증되지 않았기 때문에 로그인 필요.
-        throw new UsernameNotFoundException("로그인이 먼저 필요합니다.");
-    }
 }

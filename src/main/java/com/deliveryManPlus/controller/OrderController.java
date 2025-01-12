@@ -20,26 +20,26 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
-    @PostMapping("/user/order")
+    @PostMapping("/api/user/order")
     public ResponseEntity<Void> createOrder(@AuthenticationPrincipal UserDetailsImp userDetailsImp,
                                             @Valid @RequestBody OrderCreateRequestDto dto) {
         orderService.createOrder(userDetailsImp.getBasicAuth().getUser(), dto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/user/order")
+    @GetMapping("/api/user/order")
     public ResponseEntity<List<OrderResponseDto>> findOrderForUser(@AuthenticationPrincipal UserDetailsImp userDetailsImp) {
         List<OrderResponseDto> orderResponseDtos = orderService.findOrderForUser(userDetailsImp.getBasicAuth().getUser());
         return new ResponseEntity<>(orderResponseDtos, HttpStatus.OK);
     }
 
-    @GetMapping("/owner/{shopId}/order")
+    @GetMapping("/api/owner/{shopId}/order")
     public ResponseEntity<List<OrderResponseDto>> findOrderForOwner(@PathVariable Long shopId) {
         List<OrderResponseDto> orderResponseDtos = orderService.findOrderForOwner(shopId);
         return new ResponseEntity<>(orderResponseDtos, HttpStatus.OK);
     }
 
-    @PutMapping("/owner/{shopId}/order/{orderId}")
+    @PutMapping("/api/owner/{shopId}/order/{orderId}")
     public ResponseEntity<OrderResponseDto> updateStatus(@AuthenticationPrincipal UserDetailsImp userDetailsImp,
                                                          @PathVariable Long shopId,
                                                          @PathVariable Long orderId,
@@ -48,7 +48,7 @@ public class OrderController {
         return new ResponseEntity<>(orderResponseDto, HttpStatus.OK);
     }
 
-    @DeleteMapping("/owner/{shopId}/order/{orderId}")
+    @DeleteMapping("/api/owner/{shopId}/order/{orderId}")
     public ResponseEntity<Void> reject(@PathVariable Long shopId,
                                        @PathVariable Long orderId,
                                        @Valid @RequestBody OrderStatusRejectDto dto) {
