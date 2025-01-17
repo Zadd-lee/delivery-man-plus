@@ -1,10 +1,8 @@
 package com.deliveryManPlus.dto.auth;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @AllArgsConstructor
@@ -14,4 +12,5 @@ public class JwtAuthResponseDto {
 
   private String accessToken;
 
+  private String refreshToken;
 }
